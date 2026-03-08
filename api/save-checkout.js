@@ -1,9 +1,22 @@
-import { Redis } from "@upstash/redis";
+import { createClient } from "redis";
 
-const redis = new Redis({
-  url: process.env.UPSTASH_REDIS_REST_URL,
-  token: process.env.UPSTASH_REDIS_REST_TOKEN,
-});
+const redisUrl = process.env.STORAGE_URL || process.env.REDIS_URL;
+
+let client;
+
+async function getRedisClient() {
+  if (!redisUrl) {
+    throw new Error("Missing STORAGE_URL or REDIS_URL");
+  }
+
+  if (!client) {
+    client = createClient({ url: redisUrl });
+    client.on("error", (err) => console.error("Redis Client Error", err));
+    await client.connect();
+  }
+
+  return client;
+}
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -18,7 +31,11 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "lead_key and checkout_url are required" });
     }
 
-    await redis.set(`lead:${lead_key}`, checkout_url, { ex: 60 * 60 * 24 * 7 });
+    const redis = await getRedisClient();
+
+    await redis.set(`lead:${lead_key}`, checkout_url, {
+      EX: 60 * 60 * 24 * 7
+    });
 
     return res.status(200).json({
       ok: true,
