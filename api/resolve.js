@@ -18,7 +18,19 @@ async function getRedisClient() {
   return client;
 }
 
+function setCors(res) {
+  res.setHeader("Access-Control-Allow-Origin", "https://meetmacros.com");
+  res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+}
+
 export default async function handler(req, res) {
+  setCors(res);
+
+  if (req.method === "OPTIONS") {
+    return res.status(200).end();
+  }
+
   try {
     const lead_key = req.query.lead;
 
