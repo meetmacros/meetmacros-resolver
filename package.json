@@ -1,0 +1,8 @@
+{
+  "name": "meetmacros-resolver",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@upstash/redis": "^1.35.3"
+  }
+}
