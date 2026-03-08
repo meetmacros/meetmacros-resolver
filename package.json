@@ -3,6 +3,6 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "@upstash/redis": "^1.35.3"
+    "redis": "^4.6.14"
   }
 }
